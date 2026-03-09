@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { searchCities } from "../api/weatherService";
+import { searchCities, getCurrentWeather } from "../api/weatherService";
 
 function CitySearch({ setSelectedCity }) {
+
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
+  /* ================= SEARCH SUGGESTIONS ================= */
+
   const handleChange = async (value) => {
+
     setQuery(value);
+    setError("");
 
     if (value.length < 2) {
       setSuggestions([]);
@@ -16,31 +23,64 @@ function CitySearch({ setSelectedCity }) {
     }
 
     const results = await searchCities(value);
-    setSuggestions(results);
+
+    // show only 4 suggestions
+    setSuggestions(results.slice(0, 4));
   };
+
+  /* ================= NAVIGATE TO DETAIL ================= */
 
   const goToDetail = (cityName) => {
+
     if (!cityName) return;
+
+    const validCity = suggestions.find(
+      (city) => city.name.toLowerCase() === cityName.toLowerCase()
+    );
+
+    if (!validCity) {
+      setError("City not found. Please select from suggestions.");
+      return;
+    }
+
     const today = new Date().toISOString().split("T")[0];
-    navigate(`/detail/${cityName}/${today}`);
+
+    navigate(`/detail/${validCity.name}/${today}`);
+
+    setSuggestions([]);
   };
 
-    // Fetch user location without any external API
+  /* ================= GPS LOCATION ================= */
+
   const handleLocationFetch = () => {
+
     if (!navigator.geolocation) return;
 
-    navigator.geolocation.getCurrentPosition((position) => {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+
       const { latitude, longitude } = position.coords;
 
-      // Set lat,lon directly in input
-      setQuery(`${latitude},${longitude}`);
+      const data = await getCurrentWeather(`${latitude},${longitude}`);
+
+      const cityName = data.location.name;
+
+      setQuery(cityName);
+      setSuggestions([]);
+
+      const today = new Date().toISOString().split("T")[0];
+
+      navigate(`/detail/${cityName}/${today}`);
+
     });
   };
 
   return (
-    <div className="relative w-full">
 
-      <div className="flex gap-3 items-center">
+    <div className="search-filter">
+
+      {/* Input wrapper */}
+
+      <div className="search-input-wrapper">
 
         <input
           type="text"
@@ -48,45 +88,63 @@ function CitySearch({ setSelectedCity }) {
           placeholder="Search city..."
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") goToDetail(query);
+            if (e.key === "Enter") {
+              goToDetail(query);
+            }
           }}
-          className="flex-1 px-5 py-3 rounded-xl outline-none bg-white/80 backdrop-blur-sm text-black placeholder:text-gray-500 border border-gray-200"
+          className="search-input"
         />
 
-        {/* Location Fetch Button */}
+        {/* GPS Button */}
+
         <button
           onClick={handleLocationFetch}
-          className="px-3 py-3 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white transition"
+          className="search-location-btn"
         >
           📍
         </button>
 
-        <button
-          onClick={() => goToDetail(query)}
-          className="px-5 py-3 rounded-xl bg-black text-white hover:bg-gray-800 transition"
-        >
-          Search
-        </button>
-
       </div>
 
+      {/* Suggestions */}
+
       {suggestions.length > 0 && (
-        <div className="absolute w-full mt-2 bg-white/90 backdrop-blur-md rounded-xl shadow-lg z-20">
+
+        <div className="search-suggestions">
 
           {suggestions.map((s, i) => (
+
             <div
               key={i}
-              onClick={() => goToDetail(s.name)}
-              className="p-3 hover:bg-gray-100 cursor-pointer rounded-lg transition text-black"
+              onClick={() => {
+                setQuery(s.name);
+                goToDetail(s.name);
+              }}
+              className="search-suggestion-item"
             >
+
+              <span style={{ marginRight: "8px" }}>📍</span>
+
               {s.name}, {s.country}
+
             </div>
+
           ))}
 
         </div>
+
+      )}
+
+      {/* Error Message */}
+
+      {error && (
+        <p style={{ marginTop: "8px", fontSize: "0.85rem", color: "#ff4d4f" }}>
+          {error}
+        </p>
       )}
 
     </div>
+
   );
 }
 
