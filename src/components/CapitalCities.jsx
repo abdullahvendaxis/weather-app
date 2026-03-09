@@ -44,7 +44,9 @@ function CapitalCities() {
 
         {/* ROWS */}
         {cities.map((city, i) => {
+
           const forecast = city.forecast?.forecastday;
+          if (!forecast) return null;
 
           return (
             <div
@@ -62,20 +64,17 @@ function CapitalCities() {
 
               <div className="capital-col">
                 <img src={forecast[0].day.condition.icon} alt="" />
-                {getDayName(forecast[0].date)}{" "}
-                {forecast[0].day.avgtemp_c}°
+                {getDayName(forecast[0].date)} {forecast[0].day.avgtemp_c}°
               </div>
 
               <div className="capital-col">
                 <img src={forecast[1].day.condition.icon} alt="" />
-                {getDayName(forecast[1].date)}{" "}
-                {forecast[1].day.avgtemp_c}°
+                {getDayName(forecast[1].date)} {forecast[1].day.avgtemp_c}°
               </div>
 
               <div className="capital-col">
                 <img src={forecast[2].day.condition.icon} alt="" />
-                {getDayName(forecast[2].date)}{" "}
-                {forecast[2].day.avgtemp_c}°
+                {getDayName(forecast[2].date)} {forecast[2].day.avgtemp_c}°
               </div>
 
             </div>

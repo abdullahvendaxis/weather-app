@@ -55,13 +55,9 @@ function DayDetail() {
 
         if (date < today) {
 
-          /* History Weather */
-
           result = await getHistoryWeather(city, date);
 
         } else {
-
-          /* Forecast Weather */
 
           result = await getForecastWeather(city, 7);
 
@@ -93,7 +89,7 @@ function DayDetail() {
   if (loading) {
     return (
       <section className="detail-section">
-        <div className="detail-container">
+        <div className="detail-container px-4 sm:px-6">
           <div className="detail-loading">
             Loading weather data...
           </div>
@@ -109,7 +105,7 @@ function DayDetail() {
   if (error) {
     return (
       <section className="detail-section">
-        <div className="detail-container">
+        <div className="detail-container px-4 sm:px-6">
           <div className="detail-error">
             {error}
           </div>
@@ -138,7 +134,7 @@ function DayDetail() {
 
     <section className="detail-section">
 
-      <div className="detail-container">
+      <div className="detail-container px-4 sm:px-6">
 
         {/* ================= WEATHER SUMMARY ================= */}
 
@@ -147,7 +143,6 @@ function DayDetail() {
           date={date}
           data={data}
         />
-
 
 
         {/* ================= WEATHER ALERTS ================= */}
@@ -168,17 +163,23 @@ function DayDetail() {
 
             <div className="detail-left">
 
-              <HourlyForecast
-                hours={forecastDay.hour}
-              />
+              <div className="w-full overflow-hidden">
+                <HourlyForecast
+                  hours={forecastDay.hour}
+                />
+              </div>
 
-              <TemperatureChart
-                hours={forecastDay.hour}
-              />
+              <div className="w-full overflow-hidden">
+                <TemperatureChart
+                  hours={forecastDay.hour}
+                />
+              </div>
 
               {/* DATE NAVIGATION */}
 
-              <DateNavigationCards />
+              <div className="w-full">
+                <DateNavigationCards />
+              </div>
 
             </div>
 

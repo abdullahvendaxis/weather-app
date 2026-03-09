@@ -10,8 +10,6 @@ function CitySearch({ setSelectedCity }) {
 
   const navigate = useNavigate();
 
-  /* ================= SEARCH SUGGESTIONS ================= */
-
   const handleChange = async (value) => {
 
     setQuery(value);
@@ -23,12 +21,8 @@ function CitySearch({ setSelectedCity }) {
     }
 
     const results = await searchCities(value);
-
-    // show only 4 suggestions
     setSuggestions(results.slice(0, 4));
   };
-
-  /* ================= NAVIGATE TO DETAIL ================= */
 
   const goToDetail = (cityName) => {
 
@@ -46,11 +40,8 @@ function CitySearch({ setSelectedCity }) {
     const today = new Date().toISOString().split("T")[0];
 
     navigate(`/detail/${validCity.name}/${today}`);
-
     setSuggestions([]);
   };
-
-  /* ================= GPS LOCATION ================= */
 
   const handleLocationFetch = () => {
 
@@ -100,6 +91,7 @@ function CitySearch({ setSelectedCity }) {
         <button
           onClick={handleLocationFetch}
           className="search-location-btn"
+          aria-label="Get current location"
         >
           📍
         </button>
@@ -122,11 +114,8 @@ function CitySearch({ setSelectedCity }) {
               }}
               className="search-suggestion-item"
             >
-
               <span style={{ marginRight: "8px" }}>📍</span>
-
               {s.name}, {s.country}
-
             </div>
 
           ))}
@@ -135,16 +124,15 @@ function CitySearch({ setSelectedCity }) {
 
       )}
 
-      {/* Error Message */}
+      {/* Error */}
 
       {error && (
-        <p style={{ marginTop: "8px", fontSize: "0.85rem", color: "#ff4d4f" }}>
+        <p className="search-error">
           {error}
         </p>
       )}
 
     </div>
-
   );
 }
 
